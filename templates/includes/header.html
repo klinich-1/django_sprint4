@@ -2,9 +2,9 @@
 <header>
   <nav class="navbar navbar-light" style="background-color: lightskyblue">
     <div class="container">
-      <a class="navbar-brand" href="{% url 'blog:index' %}">
-        <img src="{% static 'img/logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
-        Блогикум
+      <a class="navbar-brand d-flex align-items-center" href="{% url 'blog:index' %}">
+        <img src="{% static 'img/logo-v2.png' %}?v=3" width="36" height="36" class="me-2" alt="Блогикум">
+        <span class="navbar-brand-text">Блогикум</span>
       </a>
       {% with request.resolver_match.view_name as view_name %}
         <ul class="nav  nav-pills">

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <style>
+      .bg { fill: #3b8b6a; }
+      .letter { fill: #ffffff; font-family: "DejaVu Sans", Arial, sans-serif; font-size: 36px; font-weight:700; }
+    </style>
+  </defs>
+  <circle class="bg" cx="32" cy="32" r="30" />
+  <text class="letter" x="50%" y="55%" text-anchor="middle" dominant-baseline="middle">Б</text>
+</svg>

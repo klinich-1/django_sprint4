@@ -1,0 +1,7 @@
+{% if post.category %}
+  {% with cat=post.category.slug|default:post.category %}
+    <a class="text-muted" href="{% url 'blog:category_posts' cat %}">
+      «{{ post.category.title|default:post.category }}»
+    </a>
+  {% endwith %}
+{% endif %}

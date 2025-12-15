@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Лента записей{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1>Лента записей</h1>
+
+    {% if page_obj and page_obj|length %}
+      {% for post in page_obj %}
+        <article class="mb-5">
+          {% include "includes/post_card.html" %}
+        </article>
+      {% endfor %}
+      {% include "includes/paginator.html" %}
+    {% elif posts %}
+      {% for post in posts %}
+        <article class="mb-5">
+          {% include "includes/post_card.html" %}
+        </article>
+      {% endfor %}
+    {% endif %}
+
+</div>
+{% endblock %}

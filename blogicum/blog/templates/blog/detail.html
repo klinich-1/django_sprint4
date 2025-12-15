@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.location }}. {{ post.date }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- APP_DETAIL_TEMPLATE -->
+    <article>
+        {% if post.image %}
+            <a href="{{ post.image.url }}" target="_blank">
+                <img src="{{ post.image.url }}" alt="" style="max-width:100%;height:auto;margin-bottom:1rem;" />
+            </a>
+        {% endif %}
+        <ul>
+            <li>Место: {{ post.location }}</li>
+            <li>Дата: {{ post.date }}</li>
+            <li>
+                Категория:
+                {% if post.category %}
+                    {% with cat=post.category.slug|default:post.category %}
+                        <a href="{% url 'blog:category_posts' cat %}">
+                            {{ post.category.title|default:post.category }}
+                        </a>
+                    {% endwith %}
+                {% endif %}
+            </li>
+            {% endif %}
+            </ul>
+            <p>
+                {{ post.text|linebreaks }}
+                {% if request.user.is_authenticated and post.author == request.user %}
+                    <a href="{% url 'blog:edit_post' post.id %}">edit</a>
+                    <a href="{% url 'blog:delete_post' post.id %}">delete</a>
+                {% endif %}
+            </p>
+    </article>
+    <section class="mt-4">
+        <h2>Комментарии</h2>
+        {% if comments %}
+            <ul>
+                {% for c in comments %}
+                    <li>
+                        {{ c.author.username }}: {{ c.text }}
+                        {% if request.user.is_authenticated and c.author == request.user %}
+                            <a href="{% url 'blog:edit_comment' post.id c.id %}">edit</a>
+                            <a href="{% url 'blog:delete_comment' post.id c.id %}">delete</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Комментариев пока нет.</p>
+        {% endif %}
+
+        {% if request.user.is_authenticated %}
+            <form method="post" action="{% url 'blog:add_comment' post.id %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Отправить</button>
+            </form>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

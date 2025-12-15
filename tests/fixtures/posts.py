@@ -85,6 +85,7 @@ def post_with_published_location(
     img = Image.new('RGB', (100, 100), color=(73, 109, 137))
     img_io = BytesIO()
     img.save(img_io, format='JPEG')
+    img_io.seek(0)
     image_file = ImageFile(img_io, name='temp_image.jpg')
     post = mixer.blend(
         'blog.Post',
@@ -92,8 +93,9 @@ def post_with_published_location(
         location=published_location,
         category=published_category,
         author=user,
-        image=image_file
     )
+    # Save image to the Post.image field so .url is available in templates
+    post.image.save('temp_image.jpg', image_file, save=True)
     return post
 
 

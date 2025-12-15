@@ -1,0 +1,20 @@
+<div class="card" style="width: 40rem;">
+  <div class="card-body">
+    <!-- RENDER_IMAGE_URL={{ post.render_image_url }} -->
+    {% if post.render_image_url %}
+      <a href="{{ post.render_image_url }}" target="_blank">
+        <img class="post-image border-3 rounded img-fluid img-thumbnail mb-2 mx-auto d-block" src="{{ post.render_image_url }}">
+      </a>
+    {% endif %}
+    <h5 class="card-title">{{ post.title }}</h5>
+    <h6 class="card-subtitle mb-2 text-muted">
+      <small>
+        {{ post.pub_date|date:"d E Y" }} | {% if post.location and post.location.is_published %}{{ post.location.name }}{% else %}Планета Земля{% endif %}<br>
+        От автора @{{ post.author.username }} в категории {% include "includes/category_link.html" %}
+      </small>
+    </h6>
+    <p class="card-text">{{ post.text|truncatewords:10 }}</p>
+    <a href="{% url 'blog:post_detail' post.id %}" class="card-link">Читать полный текст</a>
+    <a href="{% url 'blog:post_detail' post.id %}" class="card-link text-muted">Комментарии ({{ post.comment_count }})</a>
+  </div>
+</div>

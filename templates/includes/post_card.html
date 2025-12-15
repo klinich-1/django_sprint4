@@ -1,17 +1,19 @@
 <div class="col d-flex justify-content-center">
   <div class="card" style="width: 40rem;">
     <div class="card-body">
-      {% if post.image %}
-        <a href="{{ post.image.url }}" target="_blank">
-          <img class="border-3 rounded img-fluid img-thumbnail mb-2 mx-auto d-block" src="{{ post.image.url }}">
+      <!-- RENDER_IMAGE_URL={{ post.render_image_url }} -->
+      {% if post.render_image_url %}
+        <a href="{{ post.render_image_url }}" target="_blank">
+          <img class="post-image border-3 rounded img-fluid img-thumbnail mb-2 mx-auto d-block" src="{{ post.render_image_url }}">
         </a>
       {% endif %}
       <h5 class="card-title">{{ post.title }}</h5>
       <h6 class="card-subtitle mb-2 text-muted">
         <small>
-          {% if not post.is_published %}
+          {% if post.is_published == False %}
             <p class="text-danger">Пост снят с публикации админом</p>
-          {% elif not post.category.is_published %}
+          {% endif %}
+          {% if post.category and post.category.is_published == False %}
             <p class="text-danger">Выбранная категория снята с публикации админом</p>
           {% endif %}
           {{ post.pub_date|date:"d E Y, H:i" }} | {% if post.location and post.location.is_published %}{{ post.location.name }}{% else %}Планета Земля{% endif %}<br>

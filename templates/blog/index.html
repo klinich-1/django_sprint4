@@ -3,10 +3,20 @@
   Лента записей
 {% endblock %}
 {% block content %}
-  {% for post in page_obj %}
-    <article class="mb-5">
-      {% include "includes/post_card.html" %}
-    </article>
-  {% endfor %}
-  {% include "includes/paginator.html" %}
+  {% comment %} Prefer paginator `page_obj` when present, otherwise use `posts` fallback {% endcomment %}
+  {% if page_obj and page_obj|length %}
+    {% for post in page_obj %}
+      <article class="mb-5">
+        {% include "includes/post_card.html" %}
+      </article>
+    {% endfor %}
+    {% include "includes/paginator.html" %}
+  {% elif posts %}
+    {% for post in posts %}
+      <article class="mb-5">
+        {% include "includes/post_card.html" %}
+      </article>
+    {% endfor %}
+  {% endif %}
+
 {% endblock %}
