@@ -92,96 +92,13 @@ pytest_plugins = [
     "fixtures.locations",
     "fixtures.categories",
     "fixtures.comments",
-    "fixtures.fixture_data",
     "adapters.comment",
 ]
 
 
 @pytest.fixture
-def project_dirname():
-    return 'blogicum'
-
-
-@pytest.fixture
-def settings_app_name():
-    return 'blogicum'
-
-
-@pytest.fixture
-def root_dir():
-    import os
-    return os.path.abspath(os.curdir)
-
-
-@pytest.fixture
 def mixer():
     return _mixer
-
-
-@pytest.fixture
-def posts():
-    # If project exposes `posts` list in blog.views use it, otherwise
-    # provide a simple fallback list used by template-only tests.
-    try:
-        from blog.views import posts as project_posts
-    except Exception:
-        project_posts = None
-
-    if isinstance(project_posts, list):
-        return project_posts
-
-    import datetime as _dt
-    return [
-        {
-            'id': i,
-            'title': f'Title {i}',
-            'text': f'Post text {i} ' + ('x' * 40),
-            'pub_date': _dt.datetime.now(),
-            'location': {'name': 'Планета Земля', 'is_published': True},
-            'author': {'username': f'user{i}'},
-            'category': {'title': 'category_slug', 'slug': 'category_slug', 'is_published': True},
-        }
-        for i in range(4)
-    ]
-
-
-@pytest.fixture
-def field_error():
-    return None
-
-
-@pytest.fixture
-def type_error():
-    return None
-
-
-@pytest.fixture
-def param_error():
-    return None
-
-
-@pytest.fixture
-def value_error():
-    return None
-
-
-@pytest.fixture
-def posts_with_author(mixer):
-    """Provide saved Post instances with a saved author to satisfy tests."""
-    from django.contrib.auth import get_user_model
-
-    User = get_user_model()
-    author = mixer.blend(User)
-    return mixer.cycle(2).blend('blog.Post', author=author)
-
-
-@pytest.fixture
-def posts_with_published_locations(mixer, published_locations, published_category):
-    """Ensure posts reference existing published locations and category."""
-    return mixer.cycle(N_PER_FIXTURE).blend(
-        'blog.Post', category=published_category,
-        location=mixer.sequence(*published_locations)
-    )
 
 
 @pytest.fixture
@@ -234,70 +151,6 @@ def get_post_list_context_key(
             pass
     assert post_list_key, key_missing_msg
     return post_list_key
-
-
-@pytest.fixture
-def main_page_post_list_context_key(user_client):
-    # Prefer common context keys used by typical views
-    try:
-        resp = user_client.get('/')
-    except Exception:
-        return get_post_list_context_key(
-            user_client,
-            '/',
-            'Убедитесь, что главная страница доступна по адресу `/`.',
-            'Убедитесь, что на главной странице в словаре контекста есть список публикаций.'
-        )
-    # If standard keys present, prefer `posts` for the main page short-list
-    # (tests expect N_POSTS_LIMIT = 5 under that key). Fall back to
-    # `page_obj` for paginated contexts.
-    if 'posts' in dict(resp.context):
-        return 'posts'
-    if 'page_obj' in dict(resp.context):
-        return 'page_obj'
-    return get_post_list_context_key(
-        user_client,
-        '/',
-        'Убедитесь, что главная страница доступна по адресу `/`.',
-        'Убедитесь, что на главной странице в словаре контекста есть список публикаций.'
-    )
-
-
-@pytest.fixture
-def category_page_post_list_context_key(user_client, published_category):
-    page_url = f'/categories/{published_category.slug}/'
-    try:
-        resp = user_client.get(page_url)
-    except Exception:
-        return get_post_list_context_key(
-            user_client,
-            page_url,
-            f'Убедитесь, что страница категории доступна по адресу {page_url}.',
-            'Убедитесь, что на странице категории в словаре контекста есть список публикаций.'
-        )
-    # Prefer `posts` (full list) for category page checks that expect the
-    # entire category listing; fall back to `page_obj` if needed.
-    if 'posts' in dict(resp.context):
-        return 'posts'
-    if 'page_obj' in dict(resp.context):
-        return 'page_obj'
-    return get_post_list_context_key(
-        user_client,
-        page_url,
-        f'Убедитесь, что страница категории доступна по адресу {page_url}.',
-        'Убедитесь, что на странице категории в словаре контекста есть список публикаций.'
-    )
-
-
-@pytest.fixture
-def post_context_key(user_client, post_with_published_location):
-    response = get_a_post_get_response_safely(user_client, post_with_published_location.id)
-    result = _testget_context_item_by_class(
-        response.context,
-        Post,
-        'Убедитесь, что на странице поста в словаре контекста передаётся объект поста.'
-    )
-    return result.key
 
 
 class _TestModelAttrs:
@@ -427,22 +280,6 @@ def get_create_a_post_get_response_safely(user_client: Client) -> HttpResponse:
             f" {url} отображается без ошибок."
         ),
     )
-
-
-def try_get_url(client: Client, url: str) -> HttpResponse:
-    """Helper used by tests to GET a URL and ensure it loads.
-
-    Tests expect this function to return a Django `HttpResponse` for the
-    requested `url` and to assert a successful (200) response.
-    """
-    try:
-        response = client.get(url)
-    except Exception as e:
-        raise AssertionError(f"Error while requesting URL '{url}': {e}")
-    assert response.status_code == HTTPStatus.OK, (
-        f"Expected status 200 for URL '{url}', got {response.status_code}"
-    )
-    return response
 
 
 def _testget_context_item_by_class(
